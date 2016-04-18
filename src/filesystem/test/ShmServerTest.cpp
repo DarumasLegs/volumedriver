@@ -161,6 +161,11 @@ TEST_F(ShmServerTest, ovs_already_created_volume)
     uint64_t volume_size = 1 << 30;
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx != nullptr);
     EXPECT_EQ(0,
@@ -186,6 +191,11 @@ TEST_F(ShmServerTest, ovs_open_same_volume_twice)
     uint64_t volume_size = 1 << 30;
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx1 = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx1 != nullptr);
     ovs_ctx_t *ctx2 = ovs_ctx_new(ctx_attr);
@@ -216,6 +226,11 @@ TEST_F(ShmServerTest, ovs_create_write_read_destroy)
     uint64_t volume_size = 1 << 30;
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx != nullptr);
     EXPECT_EQ(0,
@@ -333,6 +348,11 @@ TEST_F(ShmServerTest, ovs_completion)
     uint64_t volume_size = 1 << 30;
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx != nullptr);
     EXPECT_EQ(0,
@@ -464,6 +484,11 @@ TEST_F(ShmServerTest, ovs_stat)
     uint64_t volume_size = 1 << 30;
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx != nullptr);
     EXPECT_EQ(ovs_create_volume(ctx,
@@ -496,6 +521,11 @@ TEST_F(ShmServerTest, ovs_list_volumes)
 
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx != nullptr);
 
@@ -545,6 +575,11 @@ TEST_F(ShmServerTest, ovs_create_rollback_list_remove_snapshot)
     int64_t timeout = 10;
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx != nullptr);
     EXPECT_EQ(ovs_create_volume(ctx,
@@ -663,6 +698,11 @@ TEST_F(ShmServerTest, ovs_completion_two_ctxs)
     uint64_t volume_size = 1 << 30;
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx1 = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx1 != nullptr);
     ovs_ctx_t *ctx2 = ovs_ctx_new(ctx_attr);
@@ -827,6 +867,11 @@ TEST_F(ShmServerTest, ovs_write_flush_read)
     uint64_t volume_size = 1 << 30;
     ovs_ctx_attr_t *ctx_attr = ovs_ctx_attr_new();
     ASSERT_TRUE(ctx_attr != nullptr);
+    EXPECT_EQ(0,
+              ovs_ctx_attr_set_transport(ctx_attr,
+                                         "shm",
+                                         NULL,
+                                         0));
     ovs_ctx_t *ctx = ovs_ctx_new(ctx_attr);
     ASSERT_TRUE(ctx != nullptr);
     EXPECT_EQ(0,
