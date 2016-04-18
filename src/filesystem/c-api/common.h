@@ -43,10 +43,13 @@ enum class RequestOp
     Write,
     Flush,
     AsyncFlush,
+    Open,
+    Close,
 };
 
 enum class TransportType
 {
+    Error,
     SharedMemory,
     TCP,
     RDMA,
@@ -73,7 +76,7 @@ struct ovs_completion
     bool _calling;
     bool _signaled;
     bool _failed;
-    size_t _rv;
+    ssize_t _rv;
     pthread_cond_t _cond;
     pthread_mutex_t _mutex;
 };
@@ -89,7 +92,7 @@ struct ovs_aio_request
     bool _signaled;
     bool _failed;
     int _errno;
-    size_t _rv;
+    ssize_t _rv;
     pthread_cond_t _cond;
     pthread_mutex_t _mutex;
 };
