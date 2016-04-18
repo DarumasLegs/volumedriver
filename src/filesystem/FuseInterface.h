@@ -15,9 +15,6 @@
 #ifndef VFS_FUSE_INTERFACE_H_
 #define VFS_FUSE_INTERFACE_H_
 
-#include "FileSystem.h"
-#include "ShmOrbInterface.h"
-
 #include <system_error>
 
 #include <boost/filesystem.hpp>
@@ -28,6 +25,9 @@
 #include <youtils/VolumeDriverComponent.h>
 
 #define FUSE_USE_VERSION 30
+#include "FileSystem.h"
+#include "ShmOrbInterface.h"
+#include "NetworkXioInterface.h"
 
 #include <fuse3/fuse.h>
 
@@ -281,6 +281,7 @@ private:
     FileSystem fs_;
     fuse* fuse_;
     std::unique_ptr<ShmOrbInterface> shm_orb_server_;
+    std::unique_ptr<NetworkXioInterface> network_server_;
 
     void
     init_ops_(fuse_operations& ops) const;
