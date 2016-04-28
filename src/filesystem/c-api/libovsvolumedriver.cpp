@@ -239,10 +239,8 @@ ovs_ctx_init(ovs_ctx_t *ctx,
     {
         try
         {
-            /* cnanakos: do we need to make queue depth configurable? */
             ctx->net_client_ =
-                std::make_shared<volumedriverfs::NetworkXioClient>(ctx->uri,
-                                                                   512);
+                std::make_shared<volumedriverfs::NetworkXioClient>(ctx->uri);
         }
         catch (...)
         {
