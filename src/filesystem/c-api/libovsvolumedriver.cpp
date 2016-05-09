@@ -33,8 +33,10 @@
 // limitations under the License.
 
 #include <cerrno>
-#include <limits.h>
 #include <map>
+
+#include <limits.h>
+#include <libxio.h>
 
 #include <youtils/SpinLock.h>
 #include <youtils/System.h>
@@ -110,17 +112,15 @@ ovs_ctx_attr_set_transport(ovs_ctx_attr_t *attr,
     if ((not strcmp(transport, "tcp")) and host)
     {
         attr->transport = TransportType::TCP;
-        attr->host = strdup(host);
         attr->port = port;
-        return 0;
+        return _hostname_to_ip(host, &attr->host);
     }
 
     if ((not strcmp(transport, "rdma")) and host)
     {
         attr->transport = TransportType::RDMA;
-        attr->host = strdup(host);
         attr->port = port;
-        return 0;
+        return _hostname_to_ip(host, &attr->host);
     }
     errno = EINVAL;
     return -1;
@@ -1504,10 +1504,54 @@ ovs_buffer_t*
 ovs_allocate(ovs_ctx_t *ctx,
              size_t size)
 {
-    ovs_buffer_t *buf = ctx->shm_ctx_->cache_->allocate(size);
-    if (!buf)
+    ovs_buffer_t *buf;
+    switch (ctx->transport)
     {
-        errno = ENOMEM;
+    case TransportType::SharedMemory:
+    {
+        buf = ctx->shm_ctx_->cache_->allocate(size);
+        if (!buf)
+        {
+            errno = ENOMEM;
+        }
+        break;
+    }
+    case TransportType::TCP:
+    case TransportType::RDMA:
+    {
+        xio_reg_mem *mem = ctx->net_client_->allocate(size);
+        if (mem)
+        {
+            buf = new ovs_buffer_t;
+            buf->buf = mem->addr;
+            buf->size = mem->length;
+            buf->mem = mem;
+            buf->from_mpool = true;
+        }
+        else
+        {
+            void *ptr;
+            /* try to be on the safe side with 4k alignment */
+            int ret = posix_memalign(&ptr, 4096, size);
+            if (ret != 0)
+            {
+                errno = ret;
+                buf = NULL;
+            }
+            else
+            {
+                buf = new ovs_buffer_t;
+                buf->buf = ptr;
+                buf->size = size;
+                buf->from_mpool = false;
+            }
+        }
+        break;
+    }
+    default:
+        errno = EINVAL;
+        buf = NULL;
+        break;
     }
     tracepoint(openvstorage_libovsvolumedriver,
                ovs_allocate,
@@ -1520,9 +1564,9 @@ ovs_allocate(ovs_ctx_t *ctx,
 void*
 ovs_buffer_data(ovs_buffer_t *ptr)
 {
-   tracepoint(openvstorage_libovsvolumedriver,
-              ovs_buffer_data,
-              ptr);
+    tracepoint(openvstorage_libovsvolumedriver,
+               ovs_buffer_data,
+               ptr);
 
     if (likely(ptr != NULL))
     {
@@ -1557,10 +1601,35 @@ int
 ovs_deallocate(ovs_ctx_t *ctx,
                ovs_buffer_t *ptr)
 {
-    int r = ctx->shm_ctx_->cache_->deallocate(ptr);
-    if (r < 0)
+    int r = 0;
+    switch (ctx->transport)
     {
-        errno = EFAULT;
+    case TransportType::SharedMemory:
+    {
+        r = ctx->shm_ctx_->cache_->deallocate(ptr);
+        if (r < 0)
+        {
+            errno = EFAULT;
+        }
+        break;
+    }
+    case TransportType::TCP:
+    case TransportType::RDMA:
+    {
+        if (ptr->from_mpool)
+        {
+            ctx->net_client_->deallocate(ptr->mem);
+        }
+        else
+        {
+            free (ptr->buf);
+        }
+        delete ptr;
+        break;
+    }
+    default:
+        errno = EINVAL; r = -1;
+        break;
     }
     tracepoint(openvstorage_libovsvolumedriver,
                ovs_deallocate,

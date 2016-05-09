@@ -35,6 +35,10 @@
 #ifndef __CONTEXT_H
 #define __CONTEXT_H
 
+#include<sys/socket.h>
+#include<netdb.h>
+#include<arpa/inet.h>
+
 #include "../ShmControlChannelProtocol.h"
 #include "../ShmClient.h"
 #include "../NetworkXioClient.h"
@@ -64,6 +68,27 @@ _is_volume_name_valid(const char *volume_name)
     {
         return true;
     }
+}
+
+static int
+_hostname_to_ip(const char *hostname, char **ip)
+{
+    int i;
+    struct hostent *he;
+    struct in_addr **addr_list;
+
+    if ((he = gethostbyname( hostname )) == NULL)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+    addr_list = (struct in_addr **) he->h_addr_list;
+    for(i = 0; addr_list[i] != NULL; i++)
+    {
+        *ip = strdup(inet_ntoa(*addr_list[i]));
+        return 0;
+    }
+    return -1;
 }
 
 static inline
